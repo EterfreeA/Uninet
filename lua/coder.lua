@@ -17,7 +17,7 @@ function coder:update(names)
 	end
 
 	for _, object in pairs(self.mappings) do
-		if object.__update then
+		if type(object) == "table" and object.__update then
 			local state, result = xpcall(object.__update, debug.traceback, object, names)
 			if not state then
 				print(result)
