@@ -1,6 +1,6 @@
 # 状态机
 状态衍生多功能状态，多功能状态派生状态机，同时状态机也是状态，由此推出无限状态机原型。  
-![UML类图](./image/UML类图.png)
+![UML类图](image/UML.png)
 
 状态机并未直接继承状态，而是继承由状态派生的多功能状态，至于多功能状态的虚函数，其目的是配合状态机的接口。  
 类模板|说明
@@ -11,7 +11,7 @@ StateMachine|状态机类模板，作为状态树的非叶子节点。
 Transition|过渡类模板。过渡是抽象事物，当处理输入和转换状态之时，在不同状态之间传递信息。
 
 状态机既能够添加状态，也能够添加状态机。如果向状态机添加状态机，就形成层次状态机。如果把状态机和状态视作节点，层次状态机就是多叉状态树。  
-![多叉状态树](./image/多叉状态树.png)  
+![多叉状态树](image/Polystate Tree.png)  
 凡是涉及状态树的序列化与反序列化，都采用深度优先的遍历方式。上图状态树的遍历顺序为S-A-A1-A2-B-C-C1-C2。
 
 ## 构建与销毁
@@ -44,15 +44,15 @@ Transition|过渡类模板。过渡是抽象事物，当处理输入和转换状
 
 ### 输入驱动
 当状态机发生输入事件之时，传递给当前状态处理，处理结束返回过渡对象，若过渡对象持有后续状态，则向状态机添加后续状态。状态机先触发当前状态的退出事件，若过渡对象指定后续状态，再触发后续状态的进入事件，否则状态机设为无效状态。  
-![输入驱动](./image/输入驱动.png)
+![输入驱动](image/Input Drive.png)
 
 ## 项目结构
 源码只含头文件，放于文件夹include。
 文件|说明
 -|-
-[State.hpp](src/State.hpp)|定义状态抽象类模板State和多功能状态抽象类模板MultiState。
-[StateMachine.hpp](src/StateMachine.hpp)|定义状态机类模板StateMachine。
-[Transition.hpp](src/Transition.hpp)|定义过渡类模板Transition。
+[State.hpp](include/State.hpp)|定义状态抽象类模板State和多功能状态抽象类模板MultiState。
+[StateMachine.hpp](include/StateMachine.hpp)|定义状态机类模板StateMachine。
+[Transition.hpp](include/Transition.hpp)|定义过渡类模板Transition。
 
 示例代码文件放于文件夹example。
 文件|说明
