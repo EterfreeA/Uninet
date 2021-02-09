@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include <vector>
 #include <set>
 #include <map>
@@ -180,7 +181,7 @@ public:
 			}
 
 			auto current = _recovery.upper_bound(_id);
-			// b.区间起始位置
+			// b.前向起始区间位置
 			if (current == _recovery.begin())
 			{
 				// 后向间断
@@ -197,7 +198,7 @@ public:
 				return;
 			}
 
-			// c.区间终止位置
+			// c.前向终止区间位置
 			if (current == _recovery.end())
 			{
 				--current;
