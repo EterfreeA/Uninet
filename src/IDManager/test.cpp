@@ -1,4 +1,4 @@
-#include "IDManager.hpp"
+﻿#include "IDManager.hpp"
 
 #include <cstddef>
 #include <cstdint>

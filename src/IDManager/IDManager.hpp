@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <vector>
 #include <mutex>
@@ -13,74 +13,74 @@ public:
 	using IDContainer = _IDContainer;
 
 private:
-	IDContainer _container; // IDÈİÆ÷
-	IDType _extra, _digit; // Ñ©»¨Ëã·¨£º¶îÍâ¼ÆÊıÓëÕ¼ÓÃÎ»Êı£¨¶ş½øÖÆ£©
-	std::mutex _mutex; // »¥³âËø
+	IDContainer _container; // IDå®¹å™¨
+	IDType _extra, _digit; // é›ªèŠ±ç®—æ³•ï¼šé¢å¤–è®¡æ•°ä¸å ç”¨ä½æ•°ï¼ˆäºŒè¿›åˆ¶ï¼‰
+	std::mutex _mutex; // äº’æ–¥é”
 
 private:
-	// ¼ÆËã×îĞ¡ID
+	// è®¡ç®—æœ€å°ID
 	static IDType getBegin(IDType _decimal, IDType _binary) noexcept
 	{
-		// ¼ÆËãÖ¸¶¨Î»ÊıµÄ×îĞ¡Öµ
+		// è®¡ç®—æŒ‡å®šä½æ•°çš„æœ€å°å€¼
 		IDType begin = 1;
 		for (IDType index = 1; index < _decimal; ++index)
 			begin *= 10;
 
-		// ±£Ö¤×îĞ¡ID²»µÍÓÚÖ¸¶¨Î»Êı
+		// ä¿è¯æœ€å°IDä¸ä½äºæŒ‡å®šä½æ•°
 		return begin + ~(static_cast<IDType>(-1) << _binary) >> _binary;
 	}
 
-	// ¼ÆËã×î´óID
+	// è®¡ç®—æœ€å¤§ID
 	static IDType getEnd(IDType _decimal, IDType _binary) noexcept
 	{
-		// ¼ÆËãÖ¸¶¨Î»ÊıµÄ×î´óÖµ
+		// è®¡ç®—æŒ‡å®šä½æ•°çš„æœ€å¤§å€¼
 		IDType end = 9;
 		for (IDType index = 1; index < _decimal; ++index)
 			end = end * 10 + 9;
 
-		// ±£Ö¤×î´óID²»³¬¹ıÖ¸¶¨Î»Êı
+		// ä¿è¯æœ€å¤§IDä¸è¶…è¿‡æŒ‡å®šä½æ•°
 		return end - ~(static_cast<IDType>(-1) << _binary) >> _binary;
 	}
 
 public:
 	/*
-	 * ²ÎÊı£º
-	 *     @_decimal	IDÎ»Êı£¨Ê®½øÖÆ£©
-	 *     @_extra		Ñ©»¨Ëã·¨Ö®¶îÍâ¼ÆÊı
-	 *     @_binary		¶îÍâ¼ÆÊıÕ¼ÓÃÎ»Êı£¨¶ş½øÖÆ£©
+	 * å‚æ•°ï¼š
+	 *     @_decimal	IDä½æ•°ï¼ˆåè¿›åˆ¶ï¼‰
+	 *     @_extra		é›ªèŠ±ç®—æ³•ä¹‹é¢å¤–è®¡æ•°
+	 *     @_binary		é¢å¤–è®¡æ•°å ç”¨ä½æ•°ï¼ˆäºŒè¿›åˆ¶ï¼‰
 	 */
 	IDManager(IDType _decimal, IDType _extra, IDType _binary) noexcept
 		: _container(getBegin(_decimal, _binary), getEnd(_decimal, _binary)), \
 		_extra(_extra), _digit(_binary) {}
 
-	// ¼ì²âIDÓĞĞ§ĞÔ
+	// æ£€æµ‹IDæœ‰æ•ˆæ€§
 	bool valid(IDType _id) const noexcept
 	{
 		return _container.valid(_id >> _digit);
 	}
 
-	// »ñÈ¡ID£¨ĞèÒª¼ì²âIDÓĞĞ§ĞÔ£©
+	// è·å–IDï¼ˆéœ€è¦æ£€æµ‹IDæœ‰æ•ˆæ€§ï¼‰
 	IDType get() noexcept
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 		return _container.get() << _digit | _extra;
 	}
 
-	// »ØÊÕID
+	// å›æ”¶ID
 	void put(IDType _id)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 		_container.put(_id >> _digit);
 	}
 
-	// ±¸·İ
+	// å¤‡ä»½
 	void backup(std::vector<IDType>& _ids)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 		return _container.backup(_ids);
 	}
 
-	// »¹Ô­
+	// è¿˜åŸ
 	bool recover(const std::vector<IDType>& _ids, IDType _index = 0)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);

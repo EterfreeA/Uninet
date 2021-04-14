@@ -1,4 +1,4 @@
-#include "Signal.h"
+ï»¿#include "Signal.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -12,19 +12,19 @@ void test(int signal)
 int main()
 {
 	using eterfree::Signal;
-	//// Íâ²¿ÖĞ¶Ï£¬Í¨³£ÎªÓÃ»§ËùÆğÊ¼£¨ÈçCtrl + C£©
+	//// å¤–éƒ¨ä¸­æ–­ï¼Œé€šå¸¸ä¸ºç”¨æˆ·æ‰€èµ·å§‹ï¼ˆå¦‚Ctrl + Cï¼‰
 	//Signal::set(SIGINT, SIG_DFL);
-	//// ·Ç·¨³ÌĞòÓ³Ïñ£¬ÀıÈç·Ç·¨Ö¸Áî
+	//// éæ³•ç¨‹åºæ˜ åƒï¼Œä¾‹å¦‚éæ³•æŒ‡ä»¤
 	//Signal::set(SIGILL, SIG_DFL);
-	//// ´íÎóËãÊõÔËËã£¬ÀıÈç³ıÒÔÁã
+	//// é”™è¯¯ç®—æœ¯è¿ç®—ï¼Œä¾‹å¦‚é™¤ä»¥é›¶
 	//Signal::set(SIGFPE, SIG_DFL);
-	//// ·Ç·¨ÄÚ´æ·ÃÎÊ£¨·Ö¶Î´íÎó£©
+	//// éæ³•å†…å­˜è®¿é—®ï¼ˆåˆ†æ®µé”™è¯¯ï¼‰
 	//Signal::set(SIGSEGV, SIG_DFL);
-	//// ·¢ËÍ¸ø³ÌĞòµÄÖÕÖ¹ÇëÇó
+	//// å‘é€ç»™ç¨‹åºçš„ç»ˆæ­¢è¯·æ±‚
 	//Signal::set(SIGTERM, SIG_DFL);
-	//// Ctrl-BreakĞòÁĞ
+	//// Ctrl-Breakåºåˆ—
 	//Signal::set(SIGBREAK, SIG_DFL);
-	//// Òì³£ÖÕÖ¹Ìõ¼ş£¬ÀıÈçÎª std::abort() ËùÆğÊ¼
+	//// å¼‚å¸¸ç»ˆæ­¢æ¡ä»¶ï¼Œä¾‹å¦‚ä¸º std::abort() æ‰€èµ·å§‹
 	//Signal::set(SIGABRT, SIG_DFL);
 
 	Signal::insert(SIGINT, 1, test);

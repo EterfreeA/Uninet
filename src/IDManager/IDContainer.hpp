@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <utility>
 #include <vector>
@@ -12,23 +12,23 @@ public:
 	using IDType = _IDType;
 
 private:
-	IDType _begin, _end, _present; // ÆğÊ¼¡¢ÖÕÖ¹Óëµ±Ç°ID
-	std::set<IDType> _recovery; // »ØÊÕID¼¯ºÏ
+	IDType _begin, _end, _present; // èµ·å§‹ã€ç»ˆæ­¢ä¸å½“å‰ID
+	std::set<IDType> _recovery; // å›æ”¶IDé›†åˆ
 
 public:
 	IDPointContainer(IDType _begin, IDType _end) noexcept
 		: _begin(_begin), _end(_end), _present(_begin) {}
 
-	// ¼ì²âIDÓĞĞ§ĞÔ
+	// æ£€æµ‹IDæœ‰æ•ˆæ€§
 	bool valid(IDType _id) const noexcept
 	{
 		return _id >= _begin && _id < _end;
 	}
 
-	// »ñÈ¡ID£¨ĞèÒª¼ì²âIDÓĞĞ§ĞÔ£©
+	// è·å–IDï¼ˆéœ€è¦æ£€æµ‹IDæœ‰æ•ˆæ€§ï¼‰
 	IDType get() noexcept
 	{
-		// ÓÅÏÈ·ÖÅä»ØÊÕID
+		// ä¼˜å…ˆåˆ†é…å›æ”¶ID
 		if (!_recovery.empty())
 		{
 			auto iterator = _recovery.cbegin();
@@ -37,25 +37,25 @@ public:
 			return id;
 		}
 
-		// ·ÖÅäµ±Ç°ID
+		// åˆ†é…å½“å‰ID
 		IDType id = _present;
-		_present = _present < _end ? _present + 1 : _end; // µ±Ç°ID×ÔÔö²¢²»³¬¹ıÖÕÖ¹ID
+		_present = _present < _end ? _present + 1 : _end; // å½“å‰IDè‡ªå¢å¹¶ä¸è¶…è¿‡ç»ˆæ­¢ID
 		return id;
 	}
 
-	// »ØÊÕID
+	// å›æ”¶ID
 	void put(IDType _id)
 	{
-		// 1.»ØÊÕIDÓëµ±Ç°ID¼ä¶Ï
+		// 1.å›æ”¶IDä¸å½“å‰IDé—´æ–­
 		if (_id + 1 != _present)
 		{
 			_recovery.insert(_id);
 			return;
 		}
 
-		// 2.»ØÊÕIDÓëµ±Ç°IDÁ¬Ğø
-		_present = _id; // µ±Ç°ID¸³ÖµÎª»ØÊÕID
-		// ºóÏò±éÀú»ØÊÕID¼¯ºÏ
+		// 2.å›æ”¶IDä¸å½“å‰IDè¿ç»­
+		_present = _id; // å½“å‰IDèµ‹å€¼ä¸ºå›æ”¶ID
+		// åå‘éå†å›æ”¶IDé›†åˆ
 		IDType span = 1;
 		auto rbegin = _recovery.crend(), rend = rbegin;
 		for (auto iterator = _recovery.crbegin(); \
@@ -70,49 +70,49 @@ public:
 			}
 		}
 
-		// Èô´æÔÚÓëµ±Ç°IDÁ¬ĞøµÄID¶Î
+		// è‹¥å­˜åœ¨ä¸å½“å‰IDè¿ç»­çš„IDæ®µ
 		if (span > 1)
 		{
 			auto iterator = --rend.base();
-			_present = *iterator; // µ±Ç°ID¸³ÖµÎªID¶ÎµÄ×îĞ¡ID
-			_recovery.erase(iterator, rbegin.base()); // ÒÆ³ıID¶Î
+			_present = *iterator; // å½“å‰IDèµ‹å€¼ä¸ºIDæ®µçš„æœ€å°ID
+			_recovery.erase(iterator, rbegin.base()); // ç§»é™¤IDæ®µ
 		}
 	}
 
-	// ±¸·İ
+	// å¤‡ä»½
 	void backup(std::vector<IDType>& _ids)
 	{
-		// Ô¤Áô¿Õ¼ä
+		// é¢„ç•™ç©ºé—´
 		_ids.reserve(_ids.size() + _recovery.size() + 1);
 
-		// ±¸·İµ±Ç°ID
+		// å¤‡ä»½å½“å‰ID
 		_ids.push_back(_present);
 
-		// ĞòÁĞ»¯»ØÊÕID
+		// åºåˆ—åŒ–å›æ”¶ID
 		_ids.insert(_ids.cend(), _recovery.cbegin(), _recovery.cend());
 	}
 
-	// »¹Ô­
+	// è¿˜åŸ
 	bool recover(const std::vector<IDType>& _ids, IDType _index = 0)
 	{
-		// ÑéÖ¤ÏòÁ¿Ë÷ÒıºÏ·¨ĞÔ
+		// éªŒè¯å‘é‡ç´¢å¼•åˆæ³•æ€§
 		if (_index >= _ids.size())
 			return false;
 
-		// ÑéÖ¤µ±Ç°IDºÏ·¨ĞÔ
+		// éªŒè¯å½“å‰IDåˆæ³•æ€§
 		IDType id = _ids[_index];
 		if (id < _begin || id > _end)
 			return false;
 
-		// ÑéÖ¤»ØÊÕIDºÏ·¨ĞÔ
+		// éªŒè¯å›æ”¶IDåˆæ³•æ€§
 		for (decltype(_ids.size()) index = _index + 1; index < _ids.size(); ++index)
 			if (!valid(_ids[index]))
 				return false;
 
-		// »¹Ô­µ±Ç°ID
+		// è¿˜åŸå½“å‰ID
 		_present = id;
 
-		// ·´ĞòÁĞ»¯»ØÊÕID
+		// ååºåˆ—åŒ–å›æ”¶ID
 		_recovery.clear();
 		_recovery.insert(_ids.cbegin() + _index + 1, _ids.cend());
 		return true;
@@ -126,31 +126,31 @@ public:
 	using IDType = _IDType;
 
 private:
-	IDType _begin, _end, _present; // ÆğÊ¼¡¢ÖÕÖ¹Óëµ±Ç°ID
-	std::map<IDType, IDType> _recovery; // »ØÊÕIDÇø¼äÈİÆ÷
+	IDType _begin, _end, _present; // èµ·å§‹ã€ç»ˆæ­¢ä¸å½“å‰ID
+	std::map<IDType, IDType> _recovery; // å›æ”¶IDåŒºé—´å®¹å™¨
 
 public:
 	IDLineContainer(IDType _begin, IDType _end) noexcept
 		: _begin(_begin), _end(_end), _present(_begin) {}
 
-	// ¼ì²âIDÓĞĞ§ĞÔ
+	// æ£€æµ‹IDæœ‰æ•ˆæ€§
 	bool valid(IDType _id) const noexcept
 	{
 		return _id >= _begin && _id < _end;
 	}
 
-	// »ñÈ¡ID£¨ĞèÒª¼ì²âIDÓĞĞ§ĞÔ£©
+	// è·å–IDï¼ˆéœ€è¦æ£€æµ‹IDæœ‰æ•ˆæ€§ï¼‰
 	IDType get() noexcept
 	{
-		// ÓÅÏÈ·ÖÅä»ØÊÕID
+		// ä¼˜å…ˆåˆ†é…å›æ”¶ID
 		if (!_recovery.empty())
 		{
 			auto iterator = _recovery.cbegin();
 			IDType id = iterator->first;
-			// ÒÆ³ıµ¥µã
+			// ç§»é™¤å•ç‚¹
 			if (id == iterator->second)
 				_recovery.erase(iterator);
-			// Ç°ÏòËõĞ¡Çø¼ä
+			// å‰å‘ç¼©å°åŒºé—´
 			else
 			{
 				//IDType second = iterator->second;
@@ -161,19 +161,19 @@ public:
 			return id;
 		}
 
-		// ·ÖÅäµ±Ç°ID
+		// åˆ†é…å½“å‰ID
 		IDType id = _present;
-		_present = _present < _end ? _present + 1 : _end; // µ±Ç°ID×ÔÔö²¢²»³¬¹ıÖÕÖ¹ID
+		_present = _present < _end ? _present + 1 : _end; // å½“å‰IDè‡ªå¢å¹¶ä¸è¶…è¿‡ç»ˆæ­¢ID
 		return id;
 	}
 
-	// »ØÊÕID
+	// å›æ”¶ID
 	void put(IDType _id)
 	{
-		// 1.»ØÊÕIDÓëµ±Ç°ID¼ä¶Ï
+		// 1.å›æ”¶IDä¸å½“å‰IDé—´æ–­
 		if (_id + 1 != _present)
 		{
-			// a.Çø¼äÈİÆ÷Îª¿Õ
+			// a.åŒºé—´å®¹å™¨ä¸ºç©º
 			if (_recovery.empty())
 			{
 				_recovery.insert(std::make_pair(_id, _id));
@@ -181,13 +181,13 @@ public:
 			}
 
 			auto current = _recovery.upper_bound(_id);
-			// b.Ç°ÏòÆğÊ¼Çø¼äÎ»ÖÃ
+			// b.å‰å‘èµ·å§‹åŒºé—´ä½ç½®
 			if (current == _recovery.begin())
 			{
-				// ºóÏò¼ä¶Ï
+				// åå‘é—´æ–­
 				if (current->first != _id + 1)
 					_recovery.insert(std::make_pair(_id, _id));
-				// ºóÏòÁ¬Ğø
+				// åå‘è¿ç»­
 				else
 				{
 					//IDType second = current->second;
@@ -198,36 +198,36 @@ public:
 				return;
 			}
 
-			// c.Ç°ÏòÖÕÖ¹Çø¼äÎ»ÖÃ
+			// c.å‰å‘ç»ˆæ­¢åŒºé—´ä½ç½®
 			if (current == _recovery.end())
 			{
 				--current;
-				// Ç°Ïò¼ä¶Ï
+				// å‰å‘é—´æ–­
 				if (current->second + 1 != _id)
 					_recovery.insert(std::make_pair(_id, _id));
-				// Ç°ÏòÁ¬Ğø
+				// å‰å‘è¿ç»­
 				else
 					current->second = _id;
 				return;
 			}
 
-			// d.Á½Çø¼äÖ®¼ä
+			// d.ä¸¤åŒºé—´ä¹‹é—´
 			auto previous = current;
 			--previous;
 			bool front = previous->second == _id - 1, back = current->first == _id + 1;
-			// Ç°ºó¼ä¶Ï
+			// å‰åé—´æ–­
 			if (!front && !back)
 				_recovery.insert(std::make_pair(_id, _id));
-			// Ç°ºóÁ¬Ğø
+			// å‰åè¿ç»­
 			else if (front && back)
 			{
 				previous->second = current->second;
 				_recovery.erase(current);
 			}
-			// ºóÏòÁ¬Ğø
+			// åå‘è¿ç»­
 			else if (front)
 				previous->second = _id;
-			// Ç°ÏòÁ¬Ğø
+			// å‰å‘è¿ç»­
 			else
 			{
 				//IDType second = current->second;
@@ -238,30 +238,30 @@ public:
 			return;
 		}
 
-		// 2.»ØÊÕIDÓëµ±Ç°IDÁ¬Ğø
-		_present = _id; // µ±Ç°ID¸³ÖµÎª»ØÊÕID
+		// 2.å›æ”¶IDä¸å½“å‰IDè¿ç»­
+		_present = _id; // å½“å‰IDèµ‹å€¼ä¸ºå›æ”¶ID
 		if (!_recovery.empty())
 		{
-			// Èô»ØÊÕIDÈİÆ÷µÄºóÏòÆğÊ¼Çø¼äÓëµ±Ç°IDÁ¬Ğø
+			// è‹¥å›æ”¶IDå®¹å™¨çš„åå‘èµ·å§‹åŒºé—´ä¸å½“å‰IDè¿ç»­
 			auto iterator = _recovery.crbegin();
 			if (iterator->second + 1 == _present)
 			{
-				_present = iterator->first; // µ±Ç°ID¸³ÖµÎªÇø¼ä×ó¶Ëµã
-				_recovery.erase(--iterator.base()); // ÒÆ³ıÇø¼ä
+				_present = iterator->first; // å½“å‰IDèµ‹å€¼ä¸ºåŒºé—´å·¦ç«¯ç‚¹
+				_recovery.erase(--iterator.base()); // ç§»é™¤åŒºé—´
 			}
 		}
 	}
 
-	// ±¸·İ
+	// å¤‡ä»½
 	void backup(std::vector<IDType>& _ids)
 	{
-		// Ô¤Áô¿Õ¼ä
+		// é¢„ç•™ç©ºé—´
 		_ids.reserve(_ids.size() + (_recovery.size() << 1) + 1);
 
-		// ±¸·İµ±Ç°ID
+		// å¤‡ä»½å½“å‰ID
 		_ids.push_back(_present);
 
-		// ĞòÁĞ»¯»ØÊÕID
+		// åºåˆ—åŒ–å›æ”¶ID
 		for (auto iterator = _recovery.cbegin(); iterator != _recovery.cend(); ++iterator)
 		{
 			_ids.push_back(iterator->first);
@@ -269,27 +269,27 @@ public:
 		}
 	}
 
-	// »¹Ô­
+	// è¿˜åŸ
 	bool recover(const std::vector<IDType>& _ids, IDType _index = 0)
 	{
-		// ÑéÖ¤ÏòÁ¿Ë÷ÒıºÏ·¨ĞÔ£¨Ê£ÓàÆæÊıÔªËØ£©
+		// éªŒè¯å‘é‡ç´¢å¼•åˆæ³•æ€§ï¼ˆå‰©ä½™å¥‡æ•°å…ƒç´ ï¼‰
 		if (_index >= _ids.size() || _ids.size() - _index - 1 & 1)
 			return false;
 
-		// ÑéÖ¤µ±Ç°IDºÏ·¨ĞÔ
+		// éªŒè¯å½“å‰IDåˆæ³•æ€§
 		IDType id = _ids[_index];
 		if (id < _begin || id > _end)
 			return false;
 
-		// ÑéÖ¤»ØÊÕIDºÏ·¨ĞÔ
+		// éªŒè¯å›æ”¶IDåˆæ³•æ€§
 		for (decltype(_ids.size()) index = _index + 1; index < _ids.size(); ++index)
 			if (!valid(_ids[index]))
 				return false;
 
-		// »¹Ô­µ±Ç°ID
+		// è¿˜åŸå½“å‰ID
 		_present = id;
 
-		// ·´ĞòÁĞ»¯»ØÊÕID
+		// ååºåˆ—åŒ–å›æ”¶ID
 		_recovery.clear();
 		for (decltype(_ids.size()) index = _index + 1; index < _ids.size(); index += 2)
 			_recovery.insert(std::make_pair(_ids[index], _ids[index + 1]));

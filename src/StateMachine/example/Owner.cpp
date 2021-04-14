@@ -1,4 +1,4 @@
-#include "Owner.hpp"
+ï»¿#include "Owner.hpp"
 
 #include <iostream>
 
@@ -19,7 +19,7 @@ void Owner::distributeStateMachine()
     _nodes.push_back(NodeType(STAGE_C1, new C1(this), 0));
     _nodes.push_back(NodeType(STAGE_C2, new C2(this), 0));
 
-    // Éú³É×´Ì¬½Úµã
+    // ç”ŸæˆçŠ¶æ€èŠ‚ç‚¹
     //_nodes.reserve(5);
     //_nodes.push_back(NodeType(0, NULL, 2));
     //_nodes.push_back(NodeType(STAGE_A, new A(this), 2));
@@ -27,26 +27,26 @@ void Owner::distributeStateMachine()
     //_nodes.push_back(NodeType(STAGE_A2, new A2(this), 0));
     //_nodes.push_back(NodeType(STAGE_B, new B(this), 0));
 
-    // ·Ö·¢×´Ì¬½Úµã£¬¹¹Ôì×´Ì¬»ú
+    // åˆ†å‘çŠ¶æ€èŠ‚ç‚¹ï¼Œæ„é€ çŠ¶æ€æœº
     _stateMachine.distribute(_nodes);
-    // Ìí¼ÓÖ¸¶¨×´Ì¬ÖÁµ±Ç°×´Ì¬½Úµã
+    // æ·»åŠ æŒ‡å®šçŠ¶æ€è‡³å½“å‰çŠ¶æ€èŠ‚ç‚¹
     //_stateMachine.addState(STAGE_C, new C(this));
-    // Ìí¼ÓÖ¸¶¨×´Ì¬ÖÁÖ¸¶¨×´Ì¬½Úµã
+    // æ·»åŠ æŒ‡å®šçŠ¶æ€è‡³æŒ‡å®šçŠ¶æ€èŠ‚ç‚¹
     //std::vector<IDType> ids(1, STAGE_C);
     //_stateMachine.addState(STAGE_C1, new C1(this), ids);
     ////_stateMachine.addState(STAGE_C2, new C2(this), ids);
 
-    // ÉèÖÃµ±Ç°×´Ì¬
+    // è®¾ç½®å½“å‰çŠ¶æ€
     _stateMachine.setState(STAGE_A);
 }
 
 void Owner::collectStateMachine()
 {
-    // ÊÕ¼¯×´Ì¬½Úµã
+    // æ”¶é›†çŠ¶æ€èŠ‚ç‚¹
     std::vector<NodeType> nodes;
     _stateMachine.collect(nodes);
 
-    // ÊÍ·Å×´Ì¬ÊµÀı
+    // é‡Šæ”¾çŠ¶æ€å®ä¾‹
     for (std::vector<NodeType>::size_type index = 0; index < nodes.size(); ++index)
         delete nodes[index]._state;
 }
@@ -70,7 +70,7 @@ void A::exit()
 TransitionType A::handle(MessageType _message)
 {
     TransitionType transition = StateMachineType::handle(_message);
-    // ¶ÔÓÚÄÚ²ã×´Ì¬£¬Èô×ª»»Ö®ºó£¬ÎŞ¿É×ª»»×´Ì¬£¬¼´¹ı¶ÉÊµÀıÎª¿ÕÀàĞÍ£¬ĞŞ¸Ä¹ı¶É¶ÔÏóÎª×ª»»ÀàĞÍ£¬²¢ÇÒÖ¸¶¨Ä¿±ê×´Ì¬B
+    // å¯¹äºå†…å±‚çŠ¶æ€ï¼Œè‹¥è½¬æ¢ä¹‹åï¼Œæ— å¯è½¬æ¢çŠ¶æ€ï¼Œå³è¿‡æ¸¡å®ä¾‹ä¸ºç©ºç±»å‹ï¼Œä¿®æ”¹è¿‡æ¸¡å¯¹è±¡ä¸ºè½¬æ¢ç±»å‹ï¼Œå¹¶ä¸”æŒ‡å®šç›®æ ‡çŠ¶æ€B
     if (transition.empty())
         transition.set(TransitionType::CONVERTIBLE, STAGE_B);
     return transition;
@@ -90,10 +90,10 @@ void B::exit()
 
 TransitionType B::handle(MessageType _message)
 {
-    // ÈôÎ´´ïµ½×ª»»Ìõ¼ş£¬·µ»ØºöÂÔ×´Ì¬µÄ¹ı¶ÉÊµÀı
+    // è‹¥æœªè¾¾åˆ°è½¬æ¢æ¡ä»¶ï¼Œè¿”å›å¿½ç•¥çŠ¶æ€çš„è¿‡æ¸¡å®ä¾‹
     if (_message < STAGE_B)
         return TransitionType(TransitionType::IGNORE);
-    // Èô´ïµ½×ª»»Ìõ¼ş£¬µ«ÓÉÓÚÎŞºóĞø×´Ì¬£¬·µ»Ø¿Õ×´Ì¬µÄ¹ı¶ÉÊµÀı
+    // è‹¥è¾¾åˆ°è½¬æ¢æ¡ä»¶ï¼Œä½†ç”±äºæ— åç»­çŠ¶æ€ï¼Œè¿”å›ç©ºçŠ¶æ€çš„è¿‡æ¸¡å®ä¾‹
     return TransitionType(TransitionType::CONVERTIBLE, STAGE_C);
 }
 
@@ -167,11 +167,11 @@ void C1::exit()
 
 TransitionType C1::handle(MessageType _message)
 {
-    // ÈôÎ´´ïµ½×ª»»Ìõ¼ş£¬·µ»ØºöÂÔ×´Ì¬µÄ¹ı¶ÉÊµÀı
+    // è‹¥æœªè¾¾åˆ°è½¬æ¢æ¡ä»¶ï¼Œè¿”å›å¿½ç•¥çŠ¶æ€çš„è¿‡æ¸¡å®ä¾‹
     if (_message < STAGE_C1)
         return TransitionType(TransitionType::IGNORE);
     return TransitionType(TransitionType::CONVERTIBLE, STAGE_C2);
-    // Èô´ïµ½×ª»»Ìõ¼ş£¬·µ»Ø´´½¨×´Ì¬µÄ¹ı¶ÉÊµÀı£¬´´½¨²¢Ö¸Ê¾×´Ì¬½Úµã×ª»»ÖÁºóĞø×´Ì¬
+    // è‹¥è¾¾åˆ°è½¬æ¢æ¡ä»¶ï¼Œè¿”å›åˆ›å»ºçŠ¶æ€çš„è¿‡æ¸¡å®ä¾‹ï¼Œåˆ›å»ºå¹¶æŒ‡ç¤ºçŠ¶æ€èŠ‚ç‚¹è½¬æ¢è‡³åç»­çŠ¶æ€
     //return TransitionType(TransitionType::CREATEABLE, STAGE_C2, new C2(_owner));
 }
 
