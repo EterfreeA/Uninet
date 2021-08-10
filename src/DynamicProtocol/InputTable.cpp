@@ -1,4 +1,4 @@
-﻿#include "Unpacker.hpp"
+﻿#include "InputTable.hpp"
 
 #define NEXT(type, typeSize, data, totalSize, offset) \
 if (auto size = sizeof(Size); totalSize - offset >= size) \
@@ -11,9 +11,7 @@ if (auto size = sizeof(Size); totalSize - offset >= size) \
 
 PROTOCOL_BEGIN
 
-using Table = Unpacker::Table;
-
-std::optional<size_t> Table::next(size_t offset)
+std::optional<size_t> InputTable::next(size_t offset)
 {
 	auto totalSize = _stream.size();
 	auto typeSize = sizeof(char);
@@ -71,7 +69,7 @@ std::optional<size_t> Table::next(size_t offset)
 	return std::nullopt;
 }
 
-void Table::parse()
+void InputTable::parse()
 {
 	auto size = _stream.size();
 	decltype(size) offset = 0;
@@ -93,7 +91,7 @@ void Table::parse()
 	}
 }
 
-std::optional<uint8_t> Table::getUint8(Number _number)
+std::optional<uint8_t> InputTable::getUint8(Number _number)
 {
 	auto iterator = _fields.find(_number);
 	if (iterator == _fields.end())
@@ -106,7 +104,7 @@ std::optional<uint8_t> Table::getUint8(Number _number)
 	return *reinterpret_cast<const uint8_t*>(data + sizeof(char));
 }
 
-std::optional<std::string> Table::getString(Number _number)
+std::optional<std::string> InputTable::getString(Number _number)
 {
 	auto iterator = _fields.find(_number);
 	if (iterator == _fields.end())
@@ -124,7 +122,7 @@ std::optional<std::string> Table::getString(Number _number)
 	return std::string(data + offset, ByteOrder::ntoh<Size, Size>(size));
 }
 
-bool Table::getString(Number _number, std::string& _string)
+bool InputTable::getString(Number _number, std::string& _string)
 {
 	auto iterator = _fields.find(_number);
 	if (iterator == _fields.end())
@@ -143,7 +141,7 @@ bool Table::getString(Number _number, std::string& _string)
 	return true;
 }
 
-bool Table::getTable(Number _number, Table& _table)
+bool InputTable::getTable(Number _number, InputTable& _table)
 {
 	auto iterator = _fields.find(_number);
 	if (iterator == _fields.end())

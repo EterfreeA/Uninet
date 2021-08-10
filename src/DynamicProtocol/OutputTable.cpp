@@ -1,10 +1,8 @@
-﻿#include "Packer.hpp"
+﻿#include "OutputTable.hpp"
 
 PROTOCOL_BEGIN
 
-using Table = Packer::Table;
-
-bool Table::setUint8(Number _number, uint8_t _value)
+bool OutputTable::setUint8(Number _number, uint8_t _value)
 {
 	constexpr auto size = sizeof _number + sizeof(char) + sizeof(char);
 	if (MAX_SIZE - _stream.size() < size)
@@ -19,7 +17,7 @@ bool Table::setUint8(Number _number, uint8_t _value)
 	return true;
 }
 
-bool Table::set(Number _number, TYPE _type, const char* _data, size_t _size)
+bool OutputTable::set(Number _number, TYPE _type, const char* _data, size_t _size)
 {
 	if (_data == nullptr && _size > 0)
 		_size = 0;

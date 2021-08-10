@@ -7,25 +7,7 @@
 
 PROTOCOL_BEGIN
 
-// 封包器
-class Packer
-{
-public:
-	class Table;
-
-private:
-	std::string _stream;
-
-public:
-	Packer(const std::string& _stream) : _stream(_stream) {}
-
-	const std::string& getPack() const noexcept
-	{
-		return _stream;
-	}
-};
-
-class Packer::Table
+class OutputTable
 {
 	std::string _stream;
 
@@ -86,7 +68,7 @@ public:
 		return set(_number, TYPE::STRING, _data, _size);
 	}
 
-	bool setTable(Number _number, const Table& _table)
+	bool setTable(Number _number, const OutputTable& _table)
 	{
 		return set(_number, TYPE::TABLE, _table.data(), _table.size());
 	}
@@ -123,7 +105,7 @@ public:
 };
 
 template <typename _Type>
-bool Packer::Table::set(Number _number, TYPE _type, _Type _value)
+bool OutputTable::set(Number _number, TYPE _type, _Type _value)
 {
 	using ByteOrder::hton;
 	constexpr auto size = sizeof _number + sizeof(char) + sizeof hton(_value);
@@ -143,7 +125,7 @@ bool Packer::Table::set(Number _number, TYPE _type, _Type _value)
 }
 
 template <typename _Type>
-bool Packer::Table::set(Number _number, TYPE _type, const _Type* _vector, size_t _size)
+bool OutputTable::set(Number _number, TYPE _type, const _Type* _vector, size_t _size)
 {
 	if (_vector == nullptr && _size > 0)
 		_size = 0;
