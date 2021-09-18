@@ -1,15 +1,20 @@
 ﻿/*
 * 文件：State.hpp
 * 
-* 版本：v1.0
+* 版本：v1.0.1
 * 作者：许聪
 * 邮箱：2592419242@qq.com
 * 创建日期：2021年01月07日
+* 更新日期：2021年09月18日
 * 
 * 摘要：
-* 1.抽象思想：主动胜于被动。自发性组织，无需管理者。
-* 2.状态衍生多功能状态，多功能状态派生状态机，而状态机也是状态。
-* 3.多功能状态为状态机前提，其虚函数为状态机的递推接口提供支持。
+* 1.设计思想：状态机也是状态。
+* 2.状态衍生状态机，而状态机既能够管理状态，也能够管理状态机。
+* 3.状态的虚函数支撑状态机的递推接口。
+* 
+* 变化：
+* v1.0.1
+* 1.删除无用抽象层。
 */
 
 #pragma once
@@ -19,27 +24,14 @@
 
 #include "Transition.hpp"
 
-template <typename _TransitionType, typename _MessageType>
+template <typename _IDType, typename _MessageType, typename _SizeType = size_t>
 class State
 {
 public:
-	typedef _TransitionType TransitionType;
-	typedef _MessageType MessageType;
-
-	virtual ~State() {};
-
-	virtual void enter() = 0;
-	virtual void exit() = 0;
-	virtual TransitionType handle(MessageType message) = 0;
-};
-
-template <typename _IDType, typename _MessageType, typename _SizeType = size_t>
-class MultiState : public State<Transition<_IDType, MultiState<_IDType, _MessageType, _SizeType> >, _MessageType>
-{
-public:
 	typedef _IDType IDType;
-	typedef MultiState StateType;
+	typedef _MessageType MessageType;
 	typedef _SizeType SizeType;
+	typedef State StateType;
 	typedef Transition<IDType, StateType> TransitionType;
 
 	typedef struct Node
@@ -56,16 +48,50 @@ private:
 	StateType* _owner;
 
 public:
-	MultiState(StateType* _owner = NULL)
+	virtual bool _distribute(const std::vector<NodeType>& _nodes, SizeType& _cursor)
+	{
+		++_cursor;
+		return true;
+	}
+
+	static void initCollection(std::vector<NodeType>& _nodes)
+	{
+		_nodes.push_back(NodeType());
+	}
+	virtual void _collect(std::vector<NodeType>& _nodes, SizeType& _cursor)
+	{
+		if (_cursor < _nodes.size())
+			_nodes[_cursor]._size = 1;
+	}
+
+	virtual bool _convert(TransitionType& _transition)
+	{
+		return true;
+	}
+
+	virtual int _update(IDType _id, const std::vector<NodeType>& _nodes, SizeType& _cursor)
+	{
+		return _nodes[_cursor]._id == _id ? 0 : 1;
+	}
+	virtual bool _update(IDType _id)
+	{
+		return true;
+	}
+
+public:
+	State(StateType* _owner = NULL)
 		: _owner(_owner) {}
+
+	virtual ~State() {};
 
 	void setOwner(StateType* _owner)
 	{
 		this->_owner = _owner;
 	}
 
-	virtual void enter() {};
-	virtual void exit() {};
+	virtual void enter() = 0;
+	virtual void exit() = 0;
+	virtual TransitionType handle(MessageType message) = 0;
 
 	bool distribute(const std::vector<NodeType>& _nodes, SizeType _cursor = 0)
 	{
@@ -137,36 +163,5 @@ public:
 	virtual StateType* getState(const std::vector<IDType>& _ids, SizeType _cursor = 0)
 	{
 		return NULL;
-	}
-
-public:
-	virtual bool _distribute(const std::vector<NodeType>& _nodes, SizeType& _cursor)
-	{
-		++_cursor;
-		return true;
-	}
-
-	static void initCollection(std::vector<NodeType>& _nodes)
-	{
-		_nodes.push_back(NodeType());
-	}
-	virtual void _collect(std::vector<NodeType>& _nodes, SizeType& _cursor)
-	{
-		if (_cursor < _nodes.size())
-			_nodes[_cursor]._size = 1;
-	}
-
-	virtual bool _convert(TransitionType& _transition)
-	{
-		return true;
-	}
-
-	virtual int _update(IDType _id, const std::vector<NodeType>& _nodes, SizeType& _cursor)
-	{
-		return _nodes[_cursor]._id == _id ? 0 : 1;
-	}
-	virtual bool _update(IDType _id)
-	{
-		return true;
 	}
 };
