@@ -61,7 +61,7 @@ public:
 	virtual void _collect(std::vector<NodeType>& _nodes, SizeType& _cursor)
 	{
 		if (_cursor < _nodes.size())
-			_nodes[_cursor]._size = 1;
+			_nodes[_cursor]._size = 0;
 	}
 
 	virtual bool _convert(TransitionType& _transition)
