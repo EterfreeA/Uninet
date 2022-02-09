@@ -11,6 +11,7 @@ class IDManager
 public:
 	using IDType = _IDType;
 	using IDContainer = _IDContainer;
+	using SizeType = typename IDContainer::SizeType;
 
 private:
 	IDContainer _container; // ID容器
@@ -19,27 +20,27 @@ private:
 
 private:
 	// 计算最小ID
-	static IDType getBegin(IDType _decimal, IDType _binary) noexcept
+	static auto getBegin(IDType _decimal, IDType _binary) noexcept
 	{
 		// 计算指定位数的最小值
-		IDType begin = 1;
-		for (IDType index = 1; index < _decimal; ++index)
+		decltype(_decimal) begin = 1;
+		for (decltype(_decimal) index = 1; index < _decimal; ++index)
 			begin *= 10;
 
 		// 保证最小ID不低于指定位数
-		return begin + ~(static_cast<IDType>(-1) << _binary) >> _binary;
+		return begin + ~(static_cast<decltype(begin)>(-1) << _binary) >> _binary;
 	}
 
 	// 计算最大ID
-	static IDType getEnd(IDType _decimal, IDType _binary) noexcept
+	static auto getEnd(IDType _decimal, IDType _binary) noexcept
 	{
 		// 计算指定位数的最大值
-		IDType end = 9;
-		for (IDType index = 1; index < _decimal; ++index)
+		decltype(_decimal) end = 9;
+		for (decltype(_decimal) index = 1; index < _decimal; ++index)
 			end = end * 10 + 9;
 
 		// 保证最大ID不超过指定位数
-		return end - ~(static_cast<IDType>(-1) << _binary) >> _binary;
+		return end - ~(static_cast<decltype(end)>(-1) << _binary) >> _binary;
 	}
 
 public:
@@ -54,36 +55,36 @@ public:
 		_extra(_extra), _digit(_binary) {}
 
 	// 检测ID有效性
-	bool valid(IDType _id) const noexcept
+	bool valid(IDType _id) const
 	{
 		return _container.valid(_id >> _digit);
 	}
 
 	// 获取ID（需要检测ID有效性）
-	IDType get() noexcept
+	auto get()
 	{
-		std::lock_guard<std::mutex> lock(_mutex);
+		std::lock_guard lock(_mutex);
 		return _container.get() << _digit | _extra;
 	}
 
 	// 回收ID
 	void put(IDType _id)
 	{
-		std::lock_guard<std::mutex> lock(_mutex);
+		std::lock_guard lock(_mutex);
 		_container.put(_id >> _digit);
 	}
 
 	// 备份
-	void backup(std::vector<IDType>& _ids)
+	void backup(std::vector<IDType>& _vector)
 	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		return _container.backup(_ids);
+		std::lock_guard lock(_mutex);
+		return _container.backup(_vector);
 	}
 
 	// 还原
-	bool recover(const std::vector<IDType>& _ids, IDType _index = 0)
+	bool recover(const std::vector<IDType>& _vector, SizeType _index = 0)
 	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		return _container.recover(_ids, _index);
+		std::lock_guard lock(_mutex);
+		return _container.recover(_vector, _index);
 	}
 };
