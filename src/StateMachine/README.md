@@ -72,7 +72,7 @@ Transition|过渡类模板。过渡是抽象事物，当转换状态之时，在
 
 ## 作者
 name：许聪  
-mailbox：2592419242@qq.com  
+mailbox：solifree@qq.com  
 CSDN：https://blog.csdn.net/xucongyoushan  
 gitee：https://gitee.com/solifree  
-github：https://github.com/xucongandxuchong
+github：https://github.com/SolifreeXu
