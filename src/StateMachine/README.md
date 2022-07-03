@@ -73,7 +73,7 @@ v1.0.1
 * [Transition.hpp](include/Transition.hpp)：定义过渡类模板Transition。
 
 示例代码文件放于文件夹example。
-* [Owner.hpp](example/Owner.hpp)：定义属主类和各状态类。
+* [Owner.h](example/Owner.h)：定义属主类和各状态类。
 * [Owner.cpp](example/Owner.cpp)：实现属主类和各状态类。
 * [test.cpp](example/test.cpp)：测试代码。
 
