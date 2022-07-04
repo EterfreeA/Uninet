@@ -1,5 +1,6 @@
 ﻿#include "Owner.h"
 
+#include <cstddef>
 #include <iostream>
 
 static void printOwner(const Owner& _owner)

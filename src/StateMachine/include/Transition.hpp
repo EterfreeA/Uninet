@@ -64,7 +64,7 @@ public:
 		this->_state = _state;
 	}
 
-	StateType* getState() const
+	StateType* getState()
 	{
 		return _state;
 	}
