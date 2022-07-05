@@ -11,6 +11,7 @@
 #error "Currently only supports Windows and Linux!"
 #endif
 
+#include <cstdlib>
 #include <ctime>
 //#include <chrono>
 #include <cstddef>
@@ -55,5 +56,5 @@ int main()
 
     // 目标状态不存在，持续转换直至最后状态退出
     stateMachine.update(Owner::STAGE_END);
-    return 0;
+    return EXIT_SUCCESS;
 }
