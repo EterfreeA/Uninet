@@ -1,28 +1,26 @@
-﻿# 唯一短ID管理器
+# 唯一短ID管理器
 雪花算法与复用算法结合，支持分布式管理ID。
 
-## 程序结构
-管理器配接容器，而容器存放当前ID和回收ID。
+## 功能
+1. 指定十进制ID位数、雪花算法的额外计数、二进制额外计数位数，获得有效ID数量。
+2. 提供获取ID、回收ID、检测ID有效性等接口。
+3. 支持序列化与反序列化，提供备份与还原接口。
 
-类模板|说明
--|-
-IDPointContainer|ID容器之一，以点形式存放回收ID。
-IDLineContainer|ID容器之一，以线段（区间）形式存放回收ID。
-IDManager|ID管理器，负责分配和回收ID。
+## 规则
+1. 优先分配回收ID，其次分配当前ID。
+2. 在回收ID与当前ID连续之时，删除回收ID并且回调当前ID。
 
-### 分配规则
-优先分配回收ID，其次分配当前ID。当回收ID与当前ID连续，即可删除回收ID，回复当前ID。
+# 版本
+当前版本：v1.0.1  
+语言标准：C++20  
+创建时间：2021年02月08日  
+更新时间：2022年07月13日
 
-## 项目结构
-源码只含头文件，另附测试源文件。
+## 变化
+**v1.0.1**
+1. 删除互斥锁。
 
-文件|说明
--|-
-[IDContainer.hpp](IDContainer.hpp)|定义ID容器类模板。
-[IDManager.hpp](IDManager.cpp)|定义ID管理器类模板。
-[test.cpp](test.cpp)|测试代码。
-
-## 作者
+# 作者
 name：许聪  
 mailbox：solifree@qq.com  
 CSDN：https://blog.csdn.net/xucongyoushan  

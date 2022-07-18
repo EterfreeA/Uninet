@@ -1,30 +1,35 @@
 ﻿#pragma once
 
-#include <type_traits>
 #include <utility>
 #include <vector>
 #include <set>
 #include <map>
 
+// 以点形式存放回收ID
 template <typename _IDType>
 class IDPointContainer
 {
 public:
 	using IDType = _IDType;
+	using VectorType = std::vector<IDType>;
+	using SizeType = VectorType::size_type;
 
 private:
 	using SetType = std::set<IDType>;
-
-public:
-	using SizeType = typename SetType::size_type;
 
 private:
 	IDType _begin, _end, _present; // 起始、终止与当前ID
 	SetType _recovery; // 回收ID集合
 
 public:
-	IDPointContainer(IDType _begin, IDType _end) noexcept
+	IDPointContainer(IDType _begin, IDType _end)
 		: _begin(_begin), _end(_end), _present(_begin) {}
+
+	// 容量
+	auto size() const noexcept
+	{
+		return _end - _begin;
+	}
 
 	// 检测ID有效性
 	bool valid(IDType _id) const
@@ -47,7 +52,9 @@ public:
 
 		// 分配当前ID
 		auto id = _present;
-		_present = _present < _end ? _present + 1 : _end; // 当前ID自增并不超过终止ID
+		// 当前ID自增并不超过终止ID
+		_present = _present < _end ? \
+			_present + 1 : _end;
 		return id;
 	}
 
@@ -67,17 +74,12 @@ public:
 		// 后向遍历回收ID集合
 		decltype(_present) span = 1;
 		auto rbegin = _recovery.crend(), rend = rbegin;
-		for (auto iterator = _recovery.crbegin(); \
-			iterator != _recovery.crend() && *iterator + span == _present; ++iterator, ++span)
-		{
-			if (span != 1)
-				rend = iterator;
-			else
-			{
-				rbegin = iterator;
-				rend = iterator;
-			}
-		}
+		if (auto iterator = _recovery.crbegin(); \
+			iterator != rend && *iterator + span == _present)
+			for (rbegin = rend = iterator++, ++span; \
+				iterator != _recovery.crend() \
+				&& *iterator + span == _present; \
+				rend = iterator++, ++span);
 
 		// 若存在与当前ID连续的ID段
 		if (span != 1)
@@ -89,7 +91,7 @@ public:
 	}
 
 	// 备份
-	void backup(std::vector<IDType>& _vector)
+	void backup(VectorType& _vector) const
 	{
 		// 预留空间
 		_vector.reserve(_vector.size() + _recovery.size() + 1);
@@ -98,20 +100,19 @@ public:
 		_vector.push_back(_present);
 
 		// 序列化回收ID
-		_vector.insert(_vector.cend(), _recovery.cbegin(), _recovery.cend());
+		_vector.insert(_vector.cend(), \
+			_recovery.cbegin(), _recovery.cend());
 	}
 
 	// 还原
-	bool recover(const std::vector<IDType>& _vector, SizeType _index = 0)
+	bool recover(const VectorType& _vector, SizeType _index = 0)
 	{
 		// 验证向量索引合法性
-		if (_index >= _vector.size())
-			return false;
+		if (_index >= _vector.size()) return false;
 
 		// 验证当前ID合法性
 		auto id = _vector[_index];
-		if (id < _begin || id > _end)
-			return false;
+		if (id < _begin || id > _end) return false;
 
 		// 备份回收ID集合
 		decltype(_recovery) recovery;
@@ -119,8 +120,7 @@ public:
 
 		// 验证回收ID合法性
 		auto offset = _index + 1;
-		for (decltype(_vector.size()) index = offset; \
-			index < _vector.size(); ++index)
+		for (auto index = offset; index < _vector.size(); ++index)
 			if (!valid(_vector[index]))
 			{
 				// 还原回收ID集合
@@ -137,17 +137,17 @@ public:
 	}
 };
 
+// 以线段（区间）形式存放回收ID
 template <typename _IDType>
 class IDLineContainer
 {
 public:
 	using IDType = _IDType;
+	using VectorType = std::vector<IDType>;
+	using SizeType = VectorType::size_type;
 
 private:
 	using MapType = std::map<IDType, IDType>;
-
-public:
-	using SizeType = typename MapType::size_type;
 
 private:
 	IDType _begin, _end, _present; // 起始、终止与当前ID
@@ -161,12 +161,19 @@ private:
 			return false;
 
 		--current;
-		return _id >= current->first && _id <= current->second;
+		return _id >= current->first \
+			&& _id <= current->second;
 	}
 
 public:
-	IDLineContainer(IDType _begin, IDType _end) noexcept
+	IDLineContainer(IDType _begin, IDType _end)
 		: _begin(_begin), _end(_end), _present(_begin) {}
+
+	// 容量
+	auto size() const noexcept
+	{
+		return _end - _begin;
+	}
 
 	// 检测ID有效性
 	bool valid(IDType _id) const
@@ -194,7 +201,6 @@ public:
 				//_recovery.erase(iterator);
 				//_recovery.emplace(id + 1, second);
 
-				using IDType = std::remove_const_t<decltype(iterator->first)>;
 				const_cast<IDType&>(iterator->first) = id + 1;
 			}
 			return id;
@@ -202,7 +208,8 @@ public:
 
 		// 分配当前ID
 		auto id = _present;
-		_present = _present < _end ? _present + 1 : _end; // 当前ID自增并不超过终止ID
+		// 当前ID自增并不超过终止ID
+		_present = _present < _end ? _present + 1 : _end;
 		return id;
 	}
 
@@ -234,7 +241,6 @@ public:
 					//_recovery.erase(current);
 					//_recovery.emplace(_id, second);
 
-					using IDType = std::remove_const_t<decltype(current->first)>;
 					const_cast<IDType&>(current->first) = _id;
 				}
 				return;
@@ -260,27 +266,32 @@ public:
 			bool front = previous->second == _id - 1;
 			bool back = current->first == _id + 1;
 
-			// 前后间断
-			if (!front && !back)
-				_recovery.emplace(_id, _id);
-			// 前后连续
-			else if (front && back)
+			if (front)
 			{
-				previous->second = current->second;
-				_recovery.erase(current);
+				// 前后连续
+				if (back)
+				{
+					previous->second = current->second;
+					_recovery.erase(current);
+				}
+				// 后向连续
+				else
+					previous->second = _id;
 			}
-			// 后向连续
-			else if (front)
-				previous->second = _id;
-			// 前向连续
 			else
 			{
-				//auto second = current->second;
-				//_recovery.erase(current);
-				//_recovery.emplace(_id, second);
+				// 前向连续
+				if (back)
+				{
+					//auto second = current->second;
+					//_recovery.erase(current);
+					//_recovery.emplace(_id, second);
 
-				using IDType = std::remove_const_t<decltype(current->first)>;
-				const_cast<IDType&>(current->first) = _id;
+					const_cast<IDType&>(current->first) = _id;
+				}
+				// 前后间断
+				else
+					_recovery.emplace(_id, _id);
 			}
 			return;
 		}
@@ -288,22 +299,20 @@ public:
 		// 2.回收ID与当前ID连续
 		_present = _id; // 当前ID赋值为回收ID
 		if (!_recovery.empty())
-		{
 			// 若回收ID容器的后向起始区间与当前ID连续
-			auto iterator = _recovery.crbegin();
-			if (iterator->second + 1 == _present)
+			if (auto iterator = _recovery.crbegin(); \
+				iterator->second + 1 == _present)
 			{
 				_present = iterator->first; // 当前ID赋值为区间左端点
 				_recovery.erase(--iterator.base()); // 移除区间
 			}
-		}
 	}
 
 	// 备份
-	void backup(std::vector<IDType>& _vector)
+	void backup(VectorType& _vector) const
 	{
 		// 预留空间
-		_vector.reserve(_vector.size() + (_recovery.size() << 1) + 1);
+		_vector.reserve(_vector.size() + _recovery.size() * 2 + 1);
 
 		// 备份当前ID
 		_vector.push_back(_present);
@@ -318,17 +327,16 @@ public:
 	}
 
 	// 还原
-	bool recover(const std::vector<IDType>& _vector, SizeType _index = 0)
+	bool recover(const VectorType& _vector, SizeType _index = 0)
 	{
 		// 验证向量索引合法性（剩余奇数元素）
 		if (_index >= _vector.size() \
-			|| _vector.size() - _index - 1 & 1)
+			|| (_vector.size() - _index - 1) % 2)
 			return false;
 
 		// 验证当前ID合法性
 		auto id = _vector[_index];
-		if (id < _begin || id > _end)
-			return false;
+		if (id < _begin || id > _end) return false;
 
 		// 备份回收ID区间容器
 		decltype(_recovery) recovery;
@@ -336,8 +344,7 @@ public:
 
 		// 验证回收ID合法性
 		auto offset = _index + 1;
-		for (decltype(_vector.size()) index = offset; \
-			index < _vector.size(); ++index)
+		for (auto index = offset; index < _vector.size(); ++index)
 			if (!valid(_vector[index]))
 			{
 				// 还原回收ID区间容器
@@ -349,8 +356,7 @@ public:
 		_present = id;
 
 		// 反序列化回收ID
-		for (decltype(_vector.size()) index = offset; \
-			index < _vector.size(); index += 2)
+		for (auto index = offset; index < _vector.size(); index += 2)
 			_recovery.emplace(_vector[index], _vector[index + 1]);
 		return true;
 	}
